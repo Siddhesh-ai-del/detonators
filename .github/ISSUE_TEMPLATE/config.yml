@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/Siddhesh-ai-del/detonators/discussions
+    about: Ask questions and share ideas
+  - name: Security advisory
+    url: https://github.com/Siddhesh-ai-del/detonators/security/advisories/new
+    about: Report a security vulnerability privately

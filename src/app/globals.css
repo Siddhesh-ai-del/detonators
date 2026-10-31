@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #faf7f0;
+  --fg: #111111;
+  --accent-yellow: #f5c518;
+  --accent-pink: #e85d75;
+  --accent-cyan: #3aa8c9;
+  --accent-lime: #9ee04f;
+  --border: #111111;
+  --shadow: #111111;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: #555555;
+  --color-accent-yellow: var(--accent-yellow);
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-lime: var(--accent-lime);
+  --color-border: var(--border);
+  --font-sans: var(--font-space-grotesk);
+  --font-display: var(--font-archivo-black);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.brutal-border {
+  border: 3px solid var(--border);
+}
+
+.brutal-shadow {
+  box-shadow: 6px 6px 0 0 var(--shadow);
+}
+
+.brutal-shadow-sm {
+  box-shadow: 4px 4px 0 0 var(--shadow);
+}
+
+.brutal-shadow-lg {
+  box-shadow: 8px 8px 0 0 var(--shadow);
+}
+
+/* Neo-brutal hover: lift */
+.brutal-hover {
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.brutal-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 0 var(--shadow);
+}
+.brutal-hover:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 var(--shadow);
+}
+
+::selection {
+  background: var(--accent-yellow);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline: 3px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.prose-brutal h1,
+.prose-brutal h2,
+.prose-brutal h3 {
+  font-family: var(--font-archivo-black), system-ui, sans-serif;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.prose-brutal p {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}
+
+.prose-brutal ul,
+.prose-brutal ol {
+  margin: 0.75rem 0 0.75rem 1.5rem;
+  list-style: disc;
+}
+
+.prose-brutal li {
+  margin: 0.25rem 0;
+}
+
+.prose-brutal code {
+  background: var(--accent-yellow);
+  border: 2px solid var(--fg);
+  padding: 0 0.25rem;
+  font-family: ui-monospace, monospace;
+}
+
+.prose-brutal pre {
+  background: var(--fg);
+  color: var(--bg);
+  border: 3px solid var(--fg);
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.prose-brutal blockquote {
+  border-left: 6px solid var(--fg);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.prose-brutal a {
+  text-decoration: underline;
+  font-weight: 700;
 }
