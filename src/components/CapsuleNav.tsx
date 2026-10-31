@@ -17,14 +17,14 @@ export default function CapsuleNav() {
     <TopCapsule ariaLabel="Top navigation">
       <Link
         href="/"
-        className="font-[family-name:var(--font-inter)] text-lg font-semibold tracking-[-0.01em] text-fg"
+        className="font-[family-name:var(--font-inter)] text-sm font-semibold tracking-[-0.01em] text-fg whitespace-nowrap sm:text-lg"
       >
         The Detonators
       </Link>
       <div className="flex items-center gap-4 sm:gap-8">
         <Link
           href="#timeline"
-          className="font-[family-name:var(--font-ibm-plex-mono)] text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-muted transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-fg"
+          className="font-[family-name:var(--font-ibm-plex-mono)] text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-muted whitespace-nowrap transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-fg"
         >
           <span className="mr-1.5 text-accent-yellow">01.</span>Timeline
         </Link>
@@ -32,7 +32,7 @@ export default function CapsuleNav() {
           <>
             <Link
               href="/new"
-              className="font-[family-name:var(--font-ibm-plex-mono)] text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-muted transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-fg"
+              className="font-[family-name:var(--font-ibm-plex-mono)] text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-muted whitespace-nowrap transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-fg"
             >
               <span className="mr-1.5 text-accent-yellow">02.</span>New entry
             </Link>
@@ -43,7 +43,7 @@ export default function CapsuleNav() {
         ) : (
           <Link
             href="/login"
-            className="font-[family-name:var(--font-ibm-plex-mono)] text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-muted transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-fg"
+            className="font-[family-name:var(--font-ibm-plex-mono)] text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-muted whitespace-nowrap transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-fg"
           >
             <span className="mr-1.5 text-accent-yellow">02.</span>Sign in
           </Link>
