@@ -1,1 +1,0 @@
-import("./src/lib/auth.ts").then(() => console.log("OK")).catch(e => console.error("ERR", e));
