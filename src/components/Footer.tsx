@@ -48,7 +48,7 @@ export default function Footer() {
         </div>
         <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t-2 border-bg/20 pt-4 text-xs opacity-60">
           <p>© {year} The Detonators. Neo-brutalist by design.</p>
-          <p>Built with Next.js &amp; Tailwind.</p>
+          <p>Built by The Detonators.</p>
         </div>
       </div>
     </footer>
