@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Search and filtering across the timeline.
+- RSS feed at `/rss.xml`.
+- Image uploads for entries.
+- Admin-only publishing controls.
+- View counts per entry.
 - Initial project scaffold (Next.js, TypeScript, Tailwind CSS).
 - Neo-brutalist portfolio site for The Detonators: hero, timeline, detail pages.
 - Member authentication (email/password) with SQLite storage.

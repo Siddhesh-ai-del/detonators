@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getEntry, getAllEntries } from "@/lib/content";
+import { incrementViews } from "@/lib/db-entries";
 import EntryDetail from "@/components/EntryDetail";
 
 export async function generateStaticParams() {
@@ -19,5 +20,6 @@ export default async function PostPage({
   const { slug } = await params;
   const entry = await getEntry("post", slug);
   if (!entry) notFound();
+  incrementViews("post", slug);
   return <EntryDetail entry={entry} />;
 }

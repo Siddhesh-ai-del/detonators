@@ -66,11 +66,8 @@ export default function LoginPage() {
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
-        <p className="mt-4 text-sm">
-          No account?{" "}
-          <a href="/signup" className="font-bold underline">
-            Create one
-          </a>
+        <p className="mt-4 text-xs text-muted">
+          Accounts are provisioned by The Detonators. Contact the team for access.
         </p>
       </div>
     </main>

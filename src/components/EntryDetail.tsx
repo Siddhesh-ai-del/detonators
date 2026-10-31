@@ -37,6 +37,11 @@ export default function EntryDetail({ entry }: { entry: Entry }) {
               day: "numeric",
             })}
           </time>
+          {typeof entry.views === "number" && (
+            <span className="text-xs font-bold uppercase tracking-wider text-muted">
+              {entry.views} views
+            </span>
+          )}
         </div>
         <h1 className="mt-4 font-display text-3xl leading-tight sm:text-4xl">
           {entry.title}

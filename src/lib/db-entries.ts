@@ -13,6 +13,7 @@ function rowToEntry(row: DbEntryRow): Entry {
     imageAlt: row.imageAlt ?? undefined,
     images: safeParseArray(row.images),
     body: row.body,
+    views: row.views ?? 0,
   };
 }
 
@@ -102,5 +103,12 @@ export function createDbEntry(input: {
     imageAlt: input.imageAlt,
     images: input.images,
     body: input.body,
+    views: 0,
   };
+}
+
+export function incrementViews(type: EntryType, slug: string): void {
+  db.prepare(
+    "UPDATE entries SET views = views + 1 WHERE type = ? AND slug = ?"
+  ).run(type, slug);
 }

@@ -16,6 +16,7 @@ export interface Entry {
   image?: string;
   imageAlt?: string;
   images?: string[];
+  views?: number;
 }
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");

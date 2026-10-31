@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getEntry, getAllEntries } from "@/lib/content";
+import { incrementViews } from "@/lib/db-entries";
 import EntryDetail from "@/components/EntryDetail";
 
 export async function generateStaticParams() {
@@ -19,5 +20,6 @@ export default async function HackathonPage({
   const { slug } = await params;
   const entry = await getEntry("hackathon", slug);
   if (!entry) notFound();
+  incrementViews("hackathon", slug);
   return <EntryDetail entry={entry} />;
 }

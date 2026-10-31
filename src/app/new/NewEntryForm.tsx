@@ -18,13 +18,32 @@ export default function NewEntryForm() {
       .map((t) => t.trim())
       .filter(Boolean);
 
+    let image = String(formData.get("image") ?? "").trim();
+    const imageFile = formData.get("imageFile");
+    if (imageFile instanceof File && imageFile.size > 0) {
+      const uploadData = new FormData();
+      uploadData.append("file", imageFile);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+      if (!uploadRes.ok) {
+        const data = await uploadRes.json().catch(() => ({}));
+        setError(data.error ?? "Image upload failed.");
+        setPending(false);
+        return;
+      }
+      const uploaded = await uploadRes.json();
+      image = uploaded.url;
+    }
+
     const payload = {
       type: formData.get("type"),
       title: formData.get("title"),
       date: formData.get("date"),
       summary: formData.get("summary"),
       tags,
-      image: formData.get("image"),
+      image: image || undefined,
       imageAlt: formData.get("imageAlt"),
       body: formData.get("body"),
     };
@@ -90,6 +109,17 @@ export default function NewEntryForm() {
         <input
           name="image"
           placeholder="/images/placeholder.svg"
+          className="mt-1 w-full brutal-border px-3 py-2"
+        />
+      </label>
+      <label className="block">
+        <span className="text-xs font-bold uppercase tracking-wider">
+          Or upload image
+        </span>
+        <input
+          name="imageFile"
+          type="file"
+          accept="image/*"
           className="mt-1 w-full brutal-border px-3 py-2"
         />
       </label>

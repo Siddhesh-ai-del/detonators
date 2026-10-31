@@ -27,15 +27,18 @@ Teams often lose track of their own progress. Events, hackathons, and posts
 end up scattered across chats and documents. The Detonators centralizes this
 history into a single, readable timeline that is easy to share.
 
-## Planned capabilities
+## Capabilities
 
-> None of these are shipped yet beyond the current implementation.
-
+Shipped:
 - Search and filtering across the timeline
-- RSS feed for posts
+- RSS feed at `/rss.xml`
 - Image uploads for entries
 - Admin-only publishing controls
-- Analytics and view counts
+- View counts per entry
+
+Planned:
+- Deployment and production hardening
+- Full test coverage
 
 ## Project status
 
@@ -48,7 +51,7 @@ Pre-release. The site runs locally and is under active development.
 | 1 | Core site, timeline, detail pages | Shipped |
 | 2 | Member authentication and authoring | Shipped |
 | 3 | Liquid-glass navigation | Shipped |
-| 4 | Search, RSS, image uploads | Planned |
+| 4 | Search, RSS, image uploads, admin controls, view counts | Shipped |
 | 5 | Deployment and production hardening | Planned |
 
 ## Installation

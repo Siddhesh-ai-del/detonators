@@ -13,6 +13,7 @@ export const auth = betterAuth({
   database: db,
   emailAndPassword: {
     enabled: true,
+    disableSignUp: true,
   },
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
@@ -33,6 +34,7 @@ db.exec(`
     images TEXT NOT NULL DEFAULT '[]',
     body TEXT NOT NULL DEFAULT '',
     authorEmail TEXT,
+    views INTEGER NOT NULL DEFAULT 0,
     createdAt TEXT NOT NULL
   );
 `);
@@ -50,5 +52,12 @@ export type DbEntryRow = {
   images: string;
   body: string;
   authorEmail: string | null;
+  views: number;
   createdAt: string;
 };
+
+try {
+  db.exec("ALTER TABLE entries ADD COLUMN views INTEGER NOT NULL DEFAULT 0;");
+} catch {
+  // Column already exists.
+}

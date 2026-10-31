@@ -7,6 +7,11 @@ import TopCapsule from "./TopCapsule";
 export default function CapsuleNav() {
   const { data: session } = authClient.useSession();
   const user = session?.user;
+  const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const isAdmin = !!user?.email && adminEmails.includes(user.email.toLowerCase());
 
   return (
     <TopCapsule ariaLabel="Top navigation">
@@ -23,7 +28,7 @@ export default function CapsuleNav() {
         >
           <span className="mr-1.5 text-accent-yellow">01.</span>Timeline
         </Link>
-        {user ? (
+        {user && isAdmin ? (
           <>
             <Link
               href="/new"

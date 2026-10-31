@@ -27,6 +27,11 @@ export default function EntryCard({ entry }: { entry: Entry }) {
               day: "numeric",
             })}
           </time>
+          {typeof entry.views === "number" && (
+            <span className="text-xs font-bold uppercase tracking-wider text-muted">
+              {entry.views} views
+            </span>
+          )}
         </div>
       <h3 className="mt-3 font-display text-xl leading-tight">
         <Link href={`/${entry.type}s/${entry.slug}`} className="hover:underline">

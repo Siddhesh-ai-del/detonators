@@ -21,6 +21,9 @@
 /data/
 *.db
 
+# uploaded files
+/public/uploads/
+
 # production
 /build
 
