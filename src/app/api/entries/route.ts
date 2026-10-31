@@ -1,56 +1,90 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { createDbEntry } from "@/lib/db-entries";
+import { createDbEntry, getDbEntries } from "@/lib/db-entries";
+import { getAllEntries } from "@/lib/content";
 import type { EntryType } from "@/lib/content";
 
-export async function POST(request: Request) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+const createSchema = z.object({
+  type: z.enum(["event", "hackathon", "post"]).default("post"),
+  title: z.string().trim().min(1).max(200),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  summary: z.string().trim().max(500).default(""),
+  tags: z.array(z.string().trim().min(1).max(40)).max(20).default([]),
+  image: z.string().trim().max(500).optional(),
+  imageAlt: z.string().trim().max(200).optional(),
+  body: z.string().max(20000).default(""),
+});
 
-  const adminEmails = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (!adminEmails.includes(session.user.email.toLowerCase())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+export async function GET(request: Request) {
+  try {
+    const url = new URL(request.url);
+    const type = url.searchParams.get("type");
+    const limit = Math.min(
+      Math.max(Number(url.searchParams.get("limit") ?? 50), 1),
+      100
+    );
+    const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
 
-  const body = await request.json();
-  const type = (body.type ?? "post") as EntryType;
-  const title = String(body.title ?? "").trim();
-  const date = String(body.date ?? "").trim();
-  const summary = String(body.summary ?? "").trim();
-  const tags = Array.isArray(body.tags)
-    ? body.tags.map(String)
-    : String(body.tags ?? "")
-        .split(",")
-        .map((t: string) => t.trim())
-        .filter(Boolean);
-  const image = body.image ? String(body.image).trim() : undefined;
-  const imageAlt = body.imageAlt ? String(body.imageAlt).trim() : undefined;
-  const entryBody = String(body.body ?? "").trim();
+    let entries = await getAllEntries();
+    if (type && ["event", "hackathon", "post"].includes(type)) {
+      entries = entries.filter((e) => e.type === type);
+    }
+    const total = entries.length;
+    const page = entries.slice(offset, offset + limit);
 
-  if (!title || !date) {
+    return NextResponse.json({ total, limit, offset, entries: page });
+  } catch (error) {
     return NextResponse.json(
-      { error: "Title and date are required." },
-      { status: 400 }
+      { error: "Failed to fetch entries." },
+      { status: 500 }
     );
   }
+}
 
-  const entry = createDbEntry({
-    type,
-    title,
-    date,
-    summary,
-    tags,
-    image,
-    imageAlt,
-    body: entryBody,
-    authorEmail: session.user.email,
-  });
+export async function POST(request: Request) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  return NextResponse.json({ slug: entry.slug, type: entry.type });
+    const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    if (!adminEmails.includes(session.user.email.toLowerCase())) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const json = await request.json();
+    const parsed = createSchema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid input.", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const data = parsed.data;
+    const entry = createDbEntry({
+      type: data.type as EntryType,
+      title: data.title,
+      date: data.date,
+      summary: data.summary,
+      tags: data.tags,
+      image: data.image,
+      imageAlt: data.imageAlt,
+      body: data.body,
+      authorEmail: session.user.email,
+    });
+
+    return NextResponse.json({ slug: entry.slug, type: entry.type }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create entry." },
+      { status: 500 }
+    );
+  }
 }
