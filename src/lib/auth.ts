@@ -1,26 +1,28 @@
 import { betterAuth } from "better-auth";
-import Database from "better-sqlite3";
+import { LibsqlDialect } from "@libsql/kysely-libsql";
+import { createClient } from "@libsql/client";
 import path from "node:path";
 import fs from "node:fs";
 
-const dataDir = path.join(process.cwd(), "data");
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+const tursoUrl = process.env.TURSO_DATABASE_URL;
+const tursoToken = process.env.TURSO_AUTH_TOKEN;
 
-const db = new Database(path.join(dataDir, "auth.db"));
-export { db };
+const client = createClient(
+  tursoUrl
+    ? { url: tursoUrl, authToken: tursoToken }
+    : { url: `file:${path.join(process.cwd(), "data", "auth.db")}` }
+);
 
-export const auth = betterAuth({
-  database: db,
-  emailAndPassword: {
-    enabled: true,
-    disableSignUp: true,
-  },
-  secret: process.env.BETTER_AUTH_SECRET!,
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
-});
+// Ensure local data dir exists for file-based dev DB.
+if (!tursoUrl) {
+  const dataDir = path.join(process.cwd(), "data");
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+}
 
-// Ensure our entries table exists.
-db.exec(`
+const dialect = new LibsqlDialect({ client });
+
+// Ensure custom entries table exists.
+await client.execute(`
   CREATE TABLE IF NOT EXISTS entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT UNIQUE NOT NULL,
@@ -39,6 +41,25 @@ db.exec(`
   );
 `);
 
+// Best-effort migration for older schemas.
+try {
+  await client.execute("ALTER TABLE entries ADD COLUMN views INTEGER NOT NULL DEFAULT 0;");
+} catch {
+  // Column already exists.
+}
+
+export { client as libsqlClient };
+
+export const auth = betterAuth({
+  database: { dialect, type: "sqlite" },
+  emailAndPassword: {
+    enabled: true,
+    disableSignUp: true,
+  },
+  secret: process.env.BETTER_AUTH_SECRET!,
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+});
+
 export type DbEntryRow = {
   id: number;
   slug: string;
@@ -55,9 +76,3 @@ export type DbEntryRow = {
   views: number;
   createdAt: string;
 };
-
-try {
-  db.exec("ALTER TABLE entries ADD COLUMN views INTEGER NOT NULL DEFAULT 0;");
-} catch {
-  // Column already exists.
-}

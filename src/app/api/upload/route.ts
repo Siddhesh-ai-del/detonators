@@ -50,6 +50,12 @@ export async function POST(request: Request) {
       );
     }
 
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const { put } = await import("@vercel/blob");
+      const blob = await put(file.name, file, { access: "public" });
+      return NextResponse.json({ url: blob.url });
+    }
+
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
     if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 

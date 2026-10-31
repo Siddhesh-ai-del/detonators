@@ -20,6 +20,6 @@ export default async function EventPage({
   const { slug } = await params;
   const entry = await getEntry("event", slug);
   if (!entry) notFound();
-  incrementViews("event", slug);
+  await incrementViews("event", slug);
   return <EntryDetail entry={entry} />;
 }

@@ -1,4 +1,4 @@
-import { db, type DbEntryRow } from "@/lib/auth";
+import { libsqlClient, type DbEntryRow } from "@/lib/auth";
 import type { Entry, EntryType } from "@/lib/content";
 
 function rowToEntry(row: DbEntryRow): Entry {
@@ -26,17 +26,20 @@ function safeParseArray(value: string): string[] {
   }
 }
 
-export function getDbEntries(): Entry[] {
-  const rows = db
-    .prepare("SELECT * FROM entries ORDER BY date DESC")
-    .all() as DbEntryRow[];
-  return rows.map(rowToEntry);
+export async function getDbEntries(): Promise<Entry[]> {
+  const result = await libsqlClient.execute("SELECT * FROM entries ORDER BY date DESC");
+  return (result.rows as unknown as DbEntryRow[]).map(rowToEntry);
 }
 
-export function getDbEntry(type: EntryType, slug: string): Entry | null {
-  const row = db
-    .prepare("SELECT * FROM entries WHERE type = ? AND slug = ?")
-    .get(type, slug) as DbEntryRow | undefined;
+export async function getDbEntry(
+  type: EntryType,
+  slug: string
+): Promise<Entry | null> {
+  const result = await libsqlClient.execute({
+    sql: "SELECT * FROM entries WHERE type = ? AND slug = ?",
+    args: [type, slug],
+  });
+  const row = result.rows[0] as unknown as DbEntryRow | undefined;
   return row ? rowToEntry(row) : null;
 }
 
@@ -48,7 +51,7 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export function createDbEntry(input: {
+export async function createDbEntry(input: {
   type: EntryType;
   title: string;
   date: string;
@@ -59,38 +62,41 @@ export function createDbEntry(input: {
   images?: string[];
   body: string;
   authorEmail?: string;
-}): Entry {
+}): Promise<Entry> {
   const base = slugify(input.title) || "entry";
-  let slug = base;
+  let slug = `u-${base}`;
+
+  // Ensure uniqueness.
   let suffix = 1;
-  while (
-    db.prepare("SELECT 1 FROM entries WHERE slug = ?").get(slug) ||
-    // avoid colliding with static slugs by prefixing db entries
-    false
-  ) {
-    slug = `${base}-${suffix++}`;
+  while (true) {
+    const existing = await libsqlClient.execute({
+      sql: "SELECT 1 FROM entries WHERE slug = ?",
+      args: [slug],
+    });
+    if (existing.rows.length === 0) break;
+    slug = `u-${base}-${suffix++}`;
   }
-  // Prefix to avoid colliding with static content slugs
-  slug = `u-${slug}`;
 
   const now = new Date().toISOString();
-  db.prepare(
-    `INSERT INTO entries (slug, type, title, date, summary, tags, image, imageAlt, images, body, authorEmail, createdAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).run(
-    slug,
-    input.type,
-    input.title,
-    input.date,
-    input.summary,
-    JSON.stringify(input.tags),
-    input.image || null,
-    input.imageAlt || null,
-    JSON.stringify(input.images ?? []),
-    input.body,
-    input.authorEmail || null,
-    now
-  );
+  await libsqlClient.execute({
+    sql: `INSERT INTO entries (slug, type, title, date, summary, tags, image, imageAlt, images, body, authorEmail, views, createdAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [
+      slug,
+      input.type,
+      input.title,
+      input.date,
+      input.summary,
+      JSON.stringify(input.tags),
+      input.image || null,
+      input.imageAlt || null,
+      JSON.stringify(input.images ?? []),
+      input.body,
+      input.authorEmail || null,
+      0,
+      now,
+    ],
+  });
 
   return {
     slug,
@@ -107,8 +113,9 @@ export function createDbEntry(input: {
   };
 }
 
-export function incrementViews(type: EntryType, slug: string): void {
-  db.prepare(
-    "UPDATE entries SET views = views + 1 WHERE type = ? AND slug = ?"
-  ).run(type, slug);
+export async function incrementViews(type: EntryType, slug: string): Promise<void> {
+  await libsqlClient.execute({
+    sql: "UPDATE entries SET views = views + 1 WHERE type = ? AND slug = ?",
+    args: [type, slug],
+  });
 }

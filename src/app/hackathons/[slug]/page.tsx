@@ -20,6 +20,6 @@ export default async function HackathonPage({
   const { slug } = await params;
   const entry = await getEntry("hackathon", slug);
   if (!entry) notFound();
-  incrementViews("hackathon", slug);
+  await incrementViews("hackathon", slug);
   return <EntryDetail entry={entry} />;
 }

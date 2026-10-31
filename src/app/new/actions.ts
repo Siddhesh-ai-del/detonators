@@ -32,7 +32,7 @@ export async function createEntryAction(formData: FormData) {
         .filter(Boolean)
     : [];
 
-  const entry = createDbEntry({
+  const entry = await createDbEntry({
     type,
     title,
     date,

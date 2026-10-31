@@ -20,6 +20,6 @@ export default async function PostPage({
   const { slug } = await params;
   const entry = await getEntry("post", slug);
   if (!entry) notFound();
-  incrementViews("post", slug);
+  await incrementViews("post", slug);
   return <EntryDetail entry={entry} />;
 }

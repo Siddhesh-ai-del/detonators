@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
-    const entry = createDbEntry({
+    const entry = await createDbEntry({
       type: data.type as EntryType,
       title: data.title,
       date: data.date,

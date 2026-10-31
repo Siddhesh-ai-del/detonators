@@ -68,7 +68,7 @@ export function getStaticEntries(): Entry[] {
 
 export async function getAllEntries(): Promise<Entry[]> {
   const staticEntries = getStaticEntries();
-  const dbEntries = getDbEntries();
+  const dbEntries = await getDbEntries();
   return [...staticEntries, ...dbEntries].sort((a, b) =>
     a.date < b.date ? 1 : -1
   );
@@ -98,7 +98,7 @@ export async function getEntry(
       };
     }
   }
-  return getDbEntry(type, slug);
+  return await getDbEntry(type, slug);
 }
 
 export const ENTRY_TYPES: EntryType[] = ["event", "hackathon", "post"];

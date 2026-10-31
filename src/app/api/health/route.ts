@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/auth";
+import { libsqlClient } from "@/lib/auth";
 
 export async function GET() {
   try {
-    db.prepare("SELECT 1").get();
+    await libsqlClient.execute("SELECT 1");
     return NextResponse.json({ status: "ok", timestamp: new Date().toISOString() });
   } catch (error) {
     return NextResponse.json(
